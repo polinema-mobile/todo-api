@@ -10,7 +10,7 @@
 - Clone the repository
 
   ```
-  git clone https://github.com/polinema-mobile/api-todo.git
+  git clone https://github.com/polinema-mobile/todo-api.git
   ```
 
 - Install the dependencies `npm install`
