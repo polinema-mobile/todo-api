@@ -9,11 +9,11 @@
     "migrate": "knex migrate:latest",
     "migrate:make": "knex migrate:make",
     "migrate:rollback": "knex migrate:rollback",
+    "seed": "knex seed:run",
     "seed:make": "knex seed:make",
-    "seed:run": "knex seed:run",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
+  "keywords": ["api", "hapijs", "todo"],
   "author": "Dian Hanifudin Subhi<dhanifudin@gmail.com>",
   "license": "ISC",
   "dependencies": {
