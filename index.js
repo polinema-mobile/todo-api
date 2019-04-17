@@ -2,30 +2,52 @@
 
 require('dotenv').config()
 
-const hapi = require('hapi')
-const server = hapi.server({
-  host: process.env.APP_HOST || 'localhost',
-  port: process.env.APP_PORT || 8000,
-  router: { stripTrailingSlash: true }
-})
+const glue = require('glue')
+const debug = process.env.APP_DEBUG === 'true'
 
-const start = async () => {
-  try {
-    const plugins = [
-      require('./app/jwt'),
-      require('./app/auth'),
-      require('./app/user'),
-      require('./app/todo'),
+const manifest = {
+  server: {
+    host: process.env.APP_HOST || 'localhost',
+    port: process.env.APP_PORT || 8000,
+    router: { stripTrailingSlash: true },
+    routes: {
+      validate: {
+        failAction: async (request, h, err) => { throw err }
+      }
+    }
+  },
+  register: {
+    plugins: [
+      require('./app/jwt'), {
+        plugin: require('./app/auth'),
+        routes: { prefix: '/v1/auth' }
+      }, {
+        plugin: require('./app/user'),
+        routes: { prefix: '/v1/users' }
+      }, {
+        plugin: require('./app/todo'),
+        routes: { prefix: '/v1/todos' }
+      }
     ]
+  }
+}
 
-    await server.register(plugins)
+const routeTable = (server) => {
+  server.table()
+    .forEach((route) => console.log(`${route.method}\t${route.path}`))
+}
+
+const startServer = async () => {
+  try {
+    const server = await glue.compose(manifest)
     await server.start()
+    console.log('Server running at: ', server.info.uri)
+
+    debug && routeTable(server)
   } catch (error) {
     console.error(error)
     process.exit(1)
   }
-
-  console.log('Server running at: ', server.info.uri)
 }
 
-start()
+startServer()

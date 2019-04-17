@@ -6,7 +6,7 @@ const model = require('./model')
 
 const searchRoute = {
   method: 'GET',
-  path: '/v1/users',
+  path: '/',
   handler: search,
   options: {
     auth: false
@@ -15,7 +15,7 @@ const searchRoute = {
 
 const createRoute = {
   method: 'POST',
-  path: '/v1/users',
+  path: '/',
   handler: create,
   options: {
     auth: false,
@@ -31,30 +31,60 @@ const createRoute = {
 
 const showRoute = {
   method: 'GET',
-  path: '/v1/users/{id}',
-  handler: show
+  path: '/{id}',
+  handler: show,
+  options: {
+    auth: false
+  }
 }
 
 const updateRoute = {
   method: 'PUT',
-  path: '/v1/users/{id}',
-  handler: update
+  path: '/{id}',
+  handler: update,
+  options: {
+    validate: {
+      payload: {
+        name: joi.string().required(),
+      }
+    }
+  }
 }
 
 const destroyRoute = {
   method: 'DELETE',
-  path: '/v1/users/{id}',
+  path: '/{id}',
   handler: destroy
 }
 
-const routes = [searchRoute, createRoute, showRoute, updateRoute, destroyRoute]
+const changePasswordRoute = {
+  method: 'POST',
+  path: '/password',
+  handler: changePassword,
+  options: {
+    validate: {
+      payload: {
+        currentPassword: joi.string().required(),
+        password: joi.string().required(),
+      }
+    }
+  }
+}
+
+const routes = [
+  searchRoute,
+  createRoute,
+  showRoute,
+  updateRoute,
+  destroyRoute,
+  changePasswordRoute,
+]
 
 async function search(request, h) {
   try {
     const { page, pageSize } = request.query
-    const response = await model.fetchPage({ page, pageSize }).then(result => {
-      return { pagination: result.pagination, result }
-    })
+    const response = await model.fetchPage({ page, pageSize })
+      .then(result => ({ statusCode: 200, pagination: result.pagination, data: result }))
 
     return h.response(response)
   } catch (error) {
@@ -67,6 +97,7 @@ async function create(request, h) {
   try {
     const { payload } = request
     const response = await model.forge(payload).save()
+      .then(result => ({ statusCode: 200, data: result }))
 
     return h.response(response)
   } catch (error) {
@@ -79,6 +110,7 @@ async function show(request, h) {
   try {
     const { id } = request.params
     const response = await model.where({ id }).fetch()
+      .then(result => ({ statusCode: 200, data: result }))
 
     if (!response) return boom.notFound()
 
@@ -96,7 +128,10 @@ async function update(request, h) {
     const { payload } = request
 
     if (id != credentials.id) return boom.forbidden()
-    const response = await model.forge(id).save(payload)
+    const user = await new model({ id }).save(payload)
+    if (!user) return boom.badImplementation()
+    const response = await model.where({ id }).fetch()
+      .then(result => ({ statusCode: 200, data: result }))
 
     return h.response(response)
   } catch (error) {
@@ -111,7 +146,27 @@ async function destroy(request, h) {
     const { id } = request.params
 
     if (id != credentials.id) return boom.forbidden()
-    const response = await model.remove(query => query.where({ id }))
+    const response = await model.where({ id }).fetch()
+      .then(result => ({ statusCode: 200, data: result }))
+    const user = await model.remove(query => query.where({ id }))
+    if (!user) return boom.badImplementation()
+
+    return h.response(response)
+  } catch (error) {
+    console.error(error)
+    return boom.badImplementation()
+  }
+}
+
+async function changePassword(request, h) {
+  try {
+    const { id } = request.auth.credentials
+    const { payload } = request
+
+    const user = await new model({ id }).save(payload)
+    if (!user) return boom.badImplementation()
+    const response = await model.where({ id }).fetch()
+      .then(result => ({ statusCode: 200, data: result }))
 
     return h.response(response)
   } catch (error) {
@@ -122,7 +177,5 @@ async function destroy(request, h) {
 
 module.exports = {
   name: 'user-routes',
-  register: server => {
-    server.route(routes)
-  }
+  register: server => server.route(routes)
 }

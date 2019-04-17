@@ -13,7 +13,11 @@
     "seed:make": "knex seed:make",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": ["api", "hapijs", "todo"],
+  "keywords": [
+    "api",
+    "hapijs",
+    "todo"
+  ],
   "author": "Dian Hanifudin Subhi<dhanifudin@gmail.com>",
   "license": "ISC",
   "dependencies": {
@@ -21,6 +25,7 @@
     "bookshelf": "^0.14.2",
     "boom": "^7.3.0",
     "dotenv": "^7.0.0",
+    "glue": "^6.0.0",
     "hapi": "^18.1.0",
     "hapi-auth-jwt2": "^8.3.0",
     "joi": "^14.3.1",

@@ -6,13 +6,13 @@ const model = require('./model')
 
 const searchRoute = {
   method: 'GET',
-  path: '/v1/todos',
+  path: '/',
   handler: search
 }
 
 const createRoute = {
   method: 'POST',
-  path: '/v1/todos',
+  path: '/',
   handler: create,
   options: {
     validate: {
@@ -25,13 +25,13 @@ const createRoute = {
 
 const showRoute = {
   method: 'GET',
-  path: '/v1/todos/{id}',
+  path: '/{id}',
   handler: show
 }
 
 const updateRoute = {
   method: 'PUT',
-  path: '/v1/todos/{id}',
+  path: '/{id}',
   handler: update,
   options: {
     validate: {
@@ -44,19 +44,19 @@ const updateRoute = {
 
 const destroyRoute = {
   method: 'DELETE',
-  path: '/v1/todos/{id}',
+  path: '/{id}',
   handler: destroy
 }
 
 const doneRoute = {
   method: 'POST',
-  path: '/v1/todos/{id}/done',
+  path: '/{id}/done',
   handler: done
 }
 
 const undoneRoute = {
   method: 'POST',
-  path: '/v1/todos/{id}/undone',
+  path: '/{id}/undone',
   handler: undone
 }
 
@@ -73,14 +73,15 @@ const routes = [
 async function search(request, h) {
   try {
     const { id } = request.auth.credentials
-    const { page, pageSize } = request.query
+    const { q, page, pageSize } = request.query
 
     const response = await model
-      .where({ user_id: id })
-      .fetchPage({ page, pageSize, withRelated: ['user'] })
-      .then(result => {
-        return { pagination: result.pagination, result }
+      .query(query => {
+        { query.where({ user_id: id }) }
+        (q) && query.where('todo', 'like', `%${q}%`)
       })
+      .fetchPage({ page, pageSize, withRelated: ['user'] })
+      .then(result => ({ pagination: result.pagination, data: result } ))
 
     return h.response(response)
   } catch (error) {
@@ -95,7 +96,10 @@ async function create(request, h) {
     const { payload } = request
     payload.userId = id
 
-    const response = await model.forge(payload).save()
+    const todo = await model.forge(payload).save()
+    if (!todo) return boom.badImplementation()
+    const response = await model.where({ id: todo.id })
+      .fetch()
 
     return h.response(response)
   } catch (error) {
@@ -146,8 +150,7 @@ async function destroy(request, h) {
     const { credentials } = request.auth
     const { id } = request.params
 
-    const todo = await model
-      .where({ id, user_id: credentials.id })
+    const todo = await model.where({ id, user_id: credentials.id })
       .fetch({ withRelated: ['user'] })
     if (!todo) return boom.forbidden()
     const destroyedTodo = await model.remove(query => query.where({ id }))
@@ -200,7 +203,5 @@ async function undone(request, h) {
 
 module.exports = {
   name: 'todo-routes',
-  register: server => {
-    server.route(routes)
-  }
+  register: server => server.route(routes)
 }

@@ -9,6 +9,9 @@ const Todo = bookshelf.Model.extend({
   hidden: [ 'userId' ],
   user: function () {
     return this.belongsTo('User')
+  },
+  processors: {
+    done: (value) => (!!value)
   }
 })
 
