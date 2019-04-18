@@ -81,7 +81,7 @@ async function search(request, h) {
         (q) && query.where('todo', 'like', `%${q}%`)
       })
       .fetchPage({ page, pageSize, withRelated: ['user'] })
-      .then(result => ({ pagination: result.pagination, data: result } ))
+      .then(data => ({ statusCode: 200, pagination: data.pagination, data }))
 
     return h.response(response)
   } catch (error) {
@@ -98,8 +98,8 @@ async function create(request, h) {
 
     const todo = await model.forge(payload).save()
     if (!todo) return boom.badImplementation()
-    const response = await model.where({ id: todo.id })
-      .fetch()
+    const response = await model.where({ id: todo.id }).fetch()
+      .then(data => ({ statusCode: 200, data }))
 
     return h.response(response)
   } catch (error) {
@@ -116,6 +116,7 @@ async function show(request, h) {
     const response = await model
       .where({ id, user_id: credentials.id })
       .fetch({ withRelated: ['user'] })
+      .then(data => ({ statusCode: 200, data }))
 
     if (!response) return boom.forbidden()
 
@@ -137,6 +138,7 @@ async function update(request, h) {
     const updatedTodo = await new model({ id }).save(payload)
     if (!updatedTodo) return boom.badImplementation()
     const response = await model.where({ id }).fetch({ withRelated: ['user'] })
+      .then(data => ({ statusCode: 200, data }))
 
     return h.response(response)
   } catch (error) {
@@ -150,13 +152,14 @@ async function destroy(request, h) {
     const { credentials } = request.auth
     const { id } = request.params
 
-    const todo = await model.where({ id, user_id: credentials.id })
+    const response = await model.where({ id, user_id: credentials.id })
       .fetch({ withRelated: ['user'] })
-    if (!todo) return boom.forbidden()
+      .then(data => ({ statusCode: 200, data }))
+    if (!response) return boom.forbidden()
     const destroyedTodo = await model.remove(query => query.where({ id }))
     if (!destroyedTodo) return boom.badImplementation()
 
-    return h.response(todo)
+    return h.response(response)
   } catch (error) {
     console.error(error)
     return boom.badImplementation()
@@ -174,6 +177,7 @@ async function done(request, h) {
     const updatedTodo = await new model({ id }).save(payload)
     if (!updatedTodo) return boom.badImplementation()
     const response = await model.where({ id }).fetch({ withRelated: ['user'] })
+      .then(data => ({ statusCode: 200, data }))
 
     return h.response(response)
   } catch (error) {
@@ -193,6 +197,7 @@ async function undone(request, h) {
     const updatedTodo = await new model({ id }).save(payload)
     if (!updatedTodo) return boom.badImplementation()
     const response = await model.where({ id }).fetch({ withRelated: ['user'] })
+      .then(data => ({ statusCode: 200, data }))
 
     return h.response(response)
   } catch (error) {

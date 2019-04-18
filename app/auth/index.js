@@ -42,7 +42,7 @@ async function token(request, h) {
       return boom.unauthorized()
 
     const token = await jwt.sign({ id: userFound.id }, key, { algorithm, expiresIn })
-    return h.response({ token })
+    return h.response({ statusCode: 200, data: token })
   } catch (error) {
     console.error(error)
     return boom.badImplementation()

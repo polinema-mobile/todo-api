@@ -84,7 +84,7 @@ async function search(request, h) {
   try {
     const { page, pageSize } = request.query
     const response = await model.fetchPage({ page, pageSize })
-      .then(result => ({ statusCode: 200, pagination: result.pagination, data: result }))
+      .then(data => ({ statusCode: 200, pagination: data.pagination, data }))
 
     return h.response(response)
   } catch (error) {
@@ -97,7 +97,7 @@ async function create(request, h) {
   try {
     const { payload } = request
     const response = await model.forge(payload).save()
-      .then(result => ({ statusCode: 200, data: result }))
+      .then(data => ({ statusCode: 200, data }))
 
     return h.response(response)
   } catch (error) {
@@ -110,7 +110,7 @@ async function show(request, h) {
   try {
     const { id } = request.params
     const response = await model.where({ id }).fetch()
-      .then(result => ({ statusCode: 200, data: result }))
+      .then(data => ({ statusCode: 200, data }))
 
     if (!response) return boom.notFound()
 
@@ -131,7 +131,7 @@ async function update(request, h) {
     const user = await new model({ id }).save(payload)
     if (!user) return boom.badImplementation()
     const response = await model.where({ id }).fetch()
-      .then(result => ({ statusCode: 200, data: result }))
+      .then(data => ({ statusCode: 200, data }))
 
     return h.response(response)
   } catch (error) {
@@ -147,7 +147,7 @@ async function destroy(request, h) {
 
     if (id != credentials.id) return boom.forbidden()
     const response = await model.where({ id }).fetch()
-      .then(result => ({ statusCode: 200, data: result }))
+      .then(data => ({ statusCode: 200, data }))
     const user = await model.remove(query => query.where({ id }))
     if (!user) return boom.badImplementation()
 
@@ -166,7 +166,7 @@ async function changePassword(request, h) {
     const user = await new model({ id }).save(payload)
     if (!user) return boom.badImplementation()
     const response = await model.where({ id }).fetch()
-      .then(result => ({ statusCode: 200, data: result }))
+      .then(data => ({ statusCode: 200, data }))
 
     return h.response(response)
   } catch (error) {
