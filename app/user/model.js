@@ -15,7 +15,8 @@ const User = bookshelf.Model.extend({
     return this.hasMany('Todo')
   },
   hashPassword: async (model) => {
-    await bcrypt.hash(model.get('password'), 10)
+    const password = model.get('password')
+    password && await bcrypt.hash(password, 10)
       .then(hash => model.set('password', hash))
   }
 })
