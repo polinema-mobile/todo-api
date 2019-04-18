@@ -1,5 +1,6 @@
 'use strict'
 
+const bcrypt = require('bcrypt')
 const boom = require('boom')
 const joi = require('joi')
 const model = require('./model')
@@ -161,8 +162,15 @@ async function destroy(request, h) {
 async function changePassword(request, h) {
   try {
     const { id } = request.auth.credentials
-    const { payload } = request
+    const { currentPassword } = request.payload
 
+    const userFound = await model.where({ id }).fetch()
+    const authenticatedUser = await bcrypt.compare(currentPassword, userFound.get('password'))
+    if (!authenticatedUser)
+      return boom.unauthorized()
+
+    const { payload } = request
+    delete payload.currentPassword
     const user = await new model({ id }).save(payload)
     if (!user) return boom.badImplementation()
     const response = await model.where({ id }).fetch()
