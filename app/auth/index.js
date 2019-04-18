@@ -57,7 +57,7 @@ async function token(request, h) {
 
 async function refresh(request, h) {
   try {
-    const { id } = request.credentials
+    const { id } = request.auth.credentials
     const token = await jwt.sign({ id }, key, { algorithm, expiresIn })
     return h.response({ statusCode: 200, data: token })
   } catch (error) {
