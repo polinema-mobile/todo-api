@@ -12,7 +12,7 @@ const key = process.env.JWT_KEY || 'veryveryverysecret'
 const algorithm = process.env.JWT_ALGORITHM || 'HS256'
 const expiresIn = process.env.JWT_EXPIRATION || '7d'
 
-const loginRoute = {
+const tokenRoute = {
   method: 'POST',
   path: '/token',
   handler: token,
@@ -25,6 +25,12 @@ const loginRoute = {
       }
     }
   }
+}
+
+const refreshRoute = {
+  method: 'POST',
+  path: '/refresh',
+  handler: refresh,
 }
 
 async function token(request, h) {
@@ -49,7 +55,20 @@ async function token(request, h) {
   }
 }
 
+async function refresh(request, h) {
+  try {
+    const { id } = request.credentials
+    const token = await jwt.sign({ id }, key, { algorithm, expiresIn })
+    return h.response({ statusCode: 200, data: token })
+  } catch (error) {
+    console.error(error)
+    return boom.badImplementation()
+  }
+}
+
+const routes = [tokenRoute, refreshRoute]
+
 module.exports = {
   name: 'auth-routes',
-  register: server => server.route(loginRoute)
+  register: server => server.route(routes)
 }
