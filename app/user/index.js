@@ -97,6 +97,9 @@ async function search(request, h) {
 async function create(request, h) {
   try {
     const { payload } = request
+    const { username } = payload
+    const userFound = await model.where({ username }).fetch()
+    if (userFound) return boom.conflict('user is already exits')
     const response = await model.forge(payload).save()
       .then(data => ({ statusCode: 200, data }))
 
