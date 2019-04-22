@@ -83,8 +83,10 @@ const routes = [
 
 async function search(request, h) {
   try {
-    const { page, pageSize } = request.query
-    const response = await model.fetchPage({ page, pageSize })
+    const { order, page, pageSize } = request.query
+    const response = await model
+      .orderBy(order)
+      .fetchPage({ page, pageSize })
       .then(data => ({ statusCode: 200, pagination: data.pagination, data }))
 
     return h.response(response)
@@ -99,7 +101,7 @@ async function create(request, h) {
     const { payload } = request
     const { username } = payload
     const userFound = await model.where({ username }).fetch()
-    if (userFound) return boom.conflict('user is already exits')
+    if (userFound) return boom.conflict('user is already exists')
     const response = await model.forge(payload).save()
       .then(data => ({ statusCode: 200, data }))
 
@@ -149,11 +151,13 @@ async function destroy(request, h) {
     const { credentials } = request.auth
     const { id } = request.params
 
-    if (id != credentials.id) return boom.forbidden()
+    if (id != credentials.id)
+      return boom.forbidden()
     const response = await model.where({ id }).fetch()
       .then(data => ({ statusCode: 200, data }))
     const user = await model.remove(query => query.where({ id }))
-    if (!user) return boom.badImplementation()
+    if (!user)
+      return boom.badImplementation()
 
     return h.response(response)
   } catch (error) {
@@ -175,7 +179,8 @@ async function changePassword(request, h) {
     const { payload } = request
     delete payload.currentPassword
     const user = await new model({ id }).save(payload)
-    if (!user) return boom.badImplementation()
+    if (!user)
+      return boom.badImplementation()
     const response = await model.where({ id }).fetch()
       .then(data => ({ statusCode: 200, data }))
 

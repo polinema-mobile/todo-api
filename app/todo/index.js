@@ -73,13 +73,15 @@ const routes = [
 async function search(request, h) {
   try {
     const { id } = request.auth.credentials
-    const { q, page, pageSize } = request.query
+    const { q, done, order, page, pageSize } = request.query
 
     const response = await model
       .query(query => {
         { query.where({ user_id: id }) }
-        (q) && query.where('todo', 'like', `%${q}%`)
+        { (done) && query.where({ done }) }
+        { (q) && query.where('todo', 'like', `%${q}%`) }
       })
+      .orderBy(order)
       .fetchPage({ page, pageSize, withRelated: ['user'] })
       .then(data => ({ statusCode: 200, pagination: data.pagination, data }))
 
