@@ -2,6 +2,8 @@
 
 require('dotenv').config()
 
+const debug = process.env.APP_DEBUG === 'true'
+
 const migrations = {
   directory: './database/migrations',
   tableName: 'migrations',
@@ -31,7 +33,7 @@ module.exports = {
   production: {
     migrations,
     seeds,
-    debug: process.env.APP_DEBUG,
+    debug,
     client: 'mysql',
     connection,
   }
