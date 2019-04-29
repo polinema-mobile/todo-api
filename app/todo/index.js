@@ -115,14 +115,13 @@ async function show(request, h) {
     const { credentials } = request.auth
     const { id } = request.params
 
-    const response = await model
+    const data = await model
       .where({ id, user_id: credentials.id })
       .fetch({ withRelated: ['user'] })
-      .then(data => ({ statusCode: 200, data }))
 
-    if (!response) return boom.forbidden()
+    if (!data) return boom.notFound()
 
-    return h.response(response)
+    return h.response({ statusCode: 200, data })
   } catch (error) {
     console.error(error)
     return boom.badImplementation()
@@ -156,9 +155,8 @@ async function destroy(request, h) {
 
     const response = await model.where({ id, user_id: credentials.id })
       .fetch({ withRelated: ['user'] })
-      .then(data => ({ statusCode: 200, data }))
     if (!response) return boom.forbidden()
-    const destroyedTodo = await model.remove(query => query.where({ id }))
+    const destroyedTodo = await model.where({ id }).destroy()
     if (!destroyedTodo) return boom.badImplementation()
 
     return h.response(response)

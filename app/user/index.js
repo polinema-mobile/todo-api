@@ -155,7 +155,7 @@ async function destroy(request, h) {
       return boom.forbidden()
     const response = await model.where({ id }).fetch()
       .then(data => ({ statusCode: 200, data }))
-    const user = await model.remove(query => query.where({ id }))
+    const user = await model.where({ id }).destroy()
     if (!user)
       return boom.badImplementation()
 
