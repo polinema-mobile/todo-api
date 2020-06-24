@@ -16,6 +16,7 @@ const tokenRoute = {
   path: '/token',
   handler: token,
   options: {
+    tags: ['api'],
     auth: false,
     validate: {
       payload: {

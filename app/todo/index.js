@@ -7,7 +7,10 @@ const model = require('./model')
 const searchRoute = {
   method: 'GET',
   path: '/',
-  handler: search
+  handler: search,
+  options: {
+    tags: ['api']
+  }
 }
 
 const createRoute = {
@@ -15,6 +18,7 @@ const createRoute = {
   path: '/',
   handler: create,
   options: {
+    tags: ['api'],
     validate: {
       payload: {
         todo: joi.string().required()
@@ -26,7 +30,10 @@ const createRoute = {
 const showRoute = {
   method: 'GET',
   path: '/{id}',
-  handler: show
+  handler: show,
+  options: {
+    tags: ['api']
+  }
 }
 
 const updateRoute = {
@@ -34,6 +41,7 @@ const updateRoute = {
   path: '/{id}',
   handler: update,
   options: {
+    tags: ['api'],
     validate: {
       payload: {
         todo: joi.string().required()
@@ -45,19 +53,28 @@ const updateRoute = {
 const destroyRoute = {
   method: 'DELETE',
   path: '/{id}',
-  handler: destroy
+  handler: destroy,
+  options: { 
+    tags: ['api']
+  }
 }
 
 const doneRoute = {
   method: 'POST',
   path: '/{id}/done',
-  handler: done
+  handler: done,
+  options: {
+    tags: ['api']
+  }
 }
 
 const undoneRoute = {
   method: 'POST',
   path: '/{id}/undone',
-  handler: undone
+  handler: undone,
+  options: {
+    tags: ['api']
+  }
 }
 
 const routes = [

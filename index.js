@@ -18,6 +18,19 @@ const manifest = {
   },
   register: {
     plugins: [
+      require('inert'),
+      require('vision'), {
+        plugin: require('hapi-swagger'),
+        options: {
+          securityDefinitions: {
+            jwt: {
+              type: 'apiKey',
+              name: 'Authorization',
+              in: 'header'
+            }
+          }
+        }
+      },
       require('./app/jwt'), {
         plugin: require('./app/auth'),
         routes: { prefix: '/v1/auth' }

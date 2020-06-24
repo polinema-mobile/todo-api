@@ -10,6 +10,7 @@ const searchRoute = {
   path: '/',
   handler: search,
   options: {
+    tags: ['api'],
     auth: false
   }
 }
@@ -19,6 +20,7 @@ const createRoute = {
   path: '/',
   handler: create,
   options: {
+    tags: ['api'],
     auth: false,
     validate: {
       payload: {
@@ -35,6 +37,7 @@ const showRoute = {
   path: '/{id}',
   handler: show,
   options: {
+    tags: ['api'],
     auth: false
   }
 }
@@ -44,6 +47,7 @@ const updateRoute = {
   path: '/{id}',
   handler: update,
   options: {
+    tags: ['api'],
     validate: {
       payload: {
         name: joi.string().required(),
@@ -55,7 +59,10 @@ const updateRoute = {
 const destroyRoute = {
   method: 'DELETE',
   path: '/{id}',
-  handler: destroy
+  handler: destroy,
+  options: {
+    tags: ['api']
+  }
 }
 
 const changePasswordRoute = {
@@ -63,6 +70,7 @@ const changePasswordRoute = {
   path: '/password',
   handler: changePassword,
   options: {
+    tags: ['api'],
     validate: {
       payload: {
         currentPassword: joi.string().required(),
