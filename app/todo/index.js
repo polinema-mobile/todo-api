@@ -9,7 +9,8 @@ const searchRoute = {
   path: '/',
   handler: search,
   options: {
-    tags: ['api']
+    tags: ['api'],
+    notes: 'Search todos'
   }
 }
 
@@ -19,6 +20,7 @@ const createRoute = {
   handler: create,
   options: {
     tags: ['api'],
+    notes: 'Create new todo',
     validate: {
       payload: {
         todo: joi.string().required()
@@ -32,7 +34,8 @@ const showRoute = {
   path: '/{id}',
   handler: show,
   options: {
-    tags: ['api']
+    tags: ['api'],
+    notes: 'Show detail information of todo'
   }
 }
 
@@ -42,6 +45,7 @@ const updateRoute = {
   handler: update,
   options: {
     tags: ['api'],
+    notes: 'Update detail of todo',
     validate: {
       payload: {
         todo: joi.string().required()
@@ -55,7 +59,8 @@ const destroyRoute = {
   path: '/{id}',
   handler: destroy,
   options: { 
-    tags: ['api']
+    tags: ['api'],
+    notes: 'Remove a todo'
   }
 }
 

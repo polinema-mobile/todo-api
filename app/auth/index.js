@@ -17,6 +17,7 @@ const tokenRoute = {
   handler: token,
   options: {
     tags: ['api'],
+    notes: 'Request token for authentication',
     auth: false,
     validate: {
       payload: {

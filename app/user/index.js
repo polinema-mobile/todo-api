@@ -11,6 +11,7 @@ const searchRoute = {
   handler: search,
   options: {
     tags: ['api'],
+    notes: 'Search registered users.',
     auth: false
   }
 }
@@ -21,6 +22,7 @@ const createRoute = {
   handler: create,
   options: {
     tags: ['api'],
+    notes: 'Register new user',
     auth: false,
     validate: {
       payload: {
@@ -48,6 +50,7 @@ const updateRoute = {
   handler: update,
   options: {
     tags: ['api'],
+    notes: 'Show detail information of user',
     validate: {
       payload: {
         name: joi.string().required(),
@@ -71,6 +74,7 @@ const changePasswordRoute = {
   handler: changePassword,
   options: {
     tags: ['api'],
+    notes: 'Change user password',
     validate: {
       payload: {
         currentPassword: joi.string().required(),
